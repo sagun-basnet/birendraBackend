@@ -1,5 +1,6 @@
 import { db } from "../database/db.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export const postUser = (req, res) => {
   const { name, address, email, password } = req.body;
@@ -67,9 +68,17 @@ export const login = (req, res) => {
     const isPasswordCorrect = bcrypt.compareSync(password, result[0].password);
 
     if (isPasswordCorrect) {
+      const token = jwt.sign(
+        { id: result[0].id, role: result[0].role },
+        "secretkey"
+      );
+      console.log(token);
+
       const { password, ...other } = result[0];
-      return res.status(200).send(other);
+
+      return res.status(200).send({ other, token });
     }
+
     return res.status(400).send("Wrong password or username");
   });
 };
