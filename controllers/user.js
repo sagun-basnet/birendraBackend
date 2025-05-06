@@ -4,6 +4,9 @@ import jwt from "jsonwebtoken";
 
 export const postUser = (req, res) => {
   const { name, address, email, password } = req.body;
+  const image = req.file;
+
+  const imgPath = `/images/${image.filename}`;
 
   const salt = bcrypt.genSaltSync(10);
   const hashedPassword = bcrypt.hashSync(password, salt);
@@ -11,12 +14,16 @@ export const postUser = (req, res) => {
   // console.log(hashedPassword);
 
   const q =
-    "insert into users(`name`, `address`, `email`, `password`) values (?,?,?,?)";
+    "insert into users(`name`, `address`, `email`, `password`, `profile`) values (?,?,?,?,?)";
 
-  db.query(q, [name, address, email, hashedPassword], (error, result) => {
-    if (error) return res.send(error);
-    return res.send({ message: "User has been created", result });
-  });
+  db.query(
+    q,
+    [name, address, email, hashedPassword, imgPath],
+    (error, result) => {
+      if (error) return res.send(error);
+      return res.send({ message: "User has been created", result });
+    }
+  );
 };
 
 // axios.get("http://localhost:5055/api/get-user-by-id/${id}")
