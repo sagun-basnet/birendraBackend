@@ -83,7 +83,14 @@ export const login = (req, res) => {
 
       const { password, ...other } = result[0];
 
-      return res.status(200).send({ other, token });
+      return res
+        .cookie("accessToken", token, {
+          httpOnly: false,
+          secure: false,
+          maxAge: 86400000,
+        })
+        .status(200)
+        .send({ other, token });
     }
 
     return res.status(400).send("Wrong password or username");
